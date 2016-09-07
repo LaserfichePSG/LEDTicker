@@ -69,7 +69,13 @@ class Matrix(object):
                 output.setdatum(x, y, self.rows[x][y])
         return output
 
-    #get_bits - DOES THIS MAKE SENSE
+    #check whether self is all 0's
+    def is_empty(self):
+        for m in range(self.m):
+            for n in range(self.n):
+                if (self.rows[m][n] != (0,0,0)):
+                    return False
+        return True
 
     #copy_constructor
     def copy_construct(self):

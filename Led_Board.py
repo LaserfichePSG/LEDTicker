@@ -1,6 +1,7 @@
 from MatrixRGB import Matrix
 from neopixel import *
 import Led_Character_Map
+import time
 
 
 #class to represent LED board
@@ -11,7 +12,7 @@ class Led_Board(object):
 
         #validate inputs
         if (not type(length) is int or length < 1 or not type(height) is int or height < 1 or not type(message) is str or len(message) < 1 or not type(strip_options) is list or not len(strip_options) == 5):
-            print ("BAD INPUTS")
+            raise LedError("Invalid LED initialization inputs")
             
         self.length = length
         self.height = height
@@ -49,7 +50,7 @@ class Led_Board(object):
         for m in range(self.height):
             for n in range(self.length):
                 #no inversion
-                temp = Color(self.message_matrix[m][n][0], self.message_matrix[m][n][1], self.message_matrix[m][n][2])
+                temp = Color(self.message_matrix.rows[m][n][0], self.message_matrix.rows[m][n][1], self.message_matrix.rows[m][n][2])
                 if (m % 2 == 0):
                      self.strip.setPixelColor(range_start + n, temp)
                 #inversion required
@@ -68,3 +69,25 @@ class Led_Board(object):
         color = Color(0, 0, 0)
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
+
+    #display message on the LED Board 
+    def display_message(buffer):
+        #validate
+        if (not type(buffer) is int or buffer < 1):
+            raise LedError("Invalid time buffer")
+
+        self.strip.begin()
+        while (not self.message_matrix.is_empty()):
+            self.set_frame()
+            self.shift_frame()
+            self.strip.show()
+            time.sleep(buffer)
+
+
+
+
+#error class
+class LedError(Exception):
+    def __init__(self, message):
+        Exception.__init__(self, message)
+            
