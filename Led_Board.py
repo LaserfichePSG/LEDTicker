@@ -1,6 +1,6 @@
 from MatrixRGB import Matrix
 from neopixel import *
-import Led_Character_Map
+from Led_Character_Map import char_map
 import time
 
 
@@ -20,6 +20,7 @@ class Led_Board(object):
         self.strip = Adafruit_NeoPixel((length*height), strip_options["led_pin"], strip_options["led_frequency"], strip_options["led_dma"], strip_options["led_invert"], strip_options["led_brightness"])
         self.message_matrix = self.generate_message_matrix()
         #self.frame = self.message_matrix.get_submatrix(self.height, self.length)
+        self.strip.begin()
 
 
     #create a message matrix from internal message string
@@ -69,6 +70,7 @@ class Led_Board(object):
         color = Color(0, 0, 0)
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
+        self.strip.show()
 
     #display message on the LED Board 
     def display_message(buffer):
@@ -76,7 +78,7 @@ class Led_Board(object):
         if (not type(buffer) is int or buffer < 1):
             raise LedError("Invalid time buffer")
 
-        self.strip.begin()
+        #self.strip.begin()
         while (not self.message_matrix.is_empty()):
             self.set_frame()
             self.shift_frame()

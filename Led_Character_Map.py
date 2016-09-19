@@ -149,6 +149,6 @@ def display_phrase(phrase):
 
 
 #display_phrase("sobriquet")
-change_color((0,0,255), False, ['b', 'c'])
-char_map['a'].print_matrix()
-char_map['b'].print_matrix()
+#change_color((0,0,255), False, ['b', 'c'])
+#char_map['a'].print_matrix()
+#char_map['b'].print_matrix()
