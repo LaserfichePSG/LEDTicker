@@ -11,7 +11,7 @@ class Led_Board(object):
     def __init__(self, length, height, message, strip_options):
 
         #validate inputs
-        if (not type(length) is int or length < 1 or not type(height) is int or height < 1 or not type(message) is str or len(message) < 1 or not type(strip_options) is list or not len(strip_options) == 5):
+        if (not type(length) is int or length < 1 or not type(height) is int or height < 1 or not type(message) is str or len(message) < 1 or not type(strip_options) is dict or not len(strip_options) == 5):
             raise LedError("Invalid LED initialization inputs")
             
         self.length = length
@@ -24,7 +24,7 @@ class Led_Board(object):
 
 
     #create a message matrix from internal message string
-    def generate_message_matrix():
+    def generate_message_matrix(self):
         count = 0
         result = None
         for char in self.message_string:
@@ -45,7 +45,7 @@ class Led_Board(object):
 
 
     #translate current message matrix into frame for strip
-    def set_frame():
+    def set_frame(self):
         range_start = 0
         range_end = self.length - 1
         for m in range(self.height):
@@ -57,23 +57,23 @@ class Led_Board(object):
                 #inversion required
                 else:
                     self.strip.setPixelColor(range_end - n, temp)
-            range_start = range_start + length
-            range_end = range_end + length
+            range_start = range_start + self.length
+            range_end = range_end + self.length
     
     #shift message matrix to reflect new frame
-    def shift_frame():
+    def shift_frame(self):
         self.message_matrix = self.message_matrix.shift_horizontal(True, Matrix(self.height, 1))
         #self.frame = self.message_matrix.get_submatrix(self.height, self.length)
 
     #turn off all pixels
-    def turn_off():
+    def turn_off(self):
         color = Color(0, 0, 0)
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, color)
         self.strip.show()
 
     #display message on the LED Board 
-    def display_message(buffer):
+    def display_message(self, buffer):
         #validate
         if (not type(buffer) is int or buffer < 1):
             raise LedError("Invalid time buffer")

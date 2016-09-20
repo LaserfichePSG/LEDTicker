@@ -4,7 +4,7 @@ from Led_Board import Led_Board
 length = 9
 height = 5
 
-message = "Hello world!"
+message = "hello world!"
 
 strip_options = {"led_pin": 18, "led_frequency": 800000, "led_dma": 5, "led_invert": False, "led_brightness": 255}
 
