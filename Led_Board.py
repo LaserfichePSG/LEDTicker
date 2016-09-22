@@ -62,8 +62,7 @@ class Led_Board(object):
     
     #shift message matrix to reflect new frame
     def shift_frame(self):
-        self.message_matrix = self.message_matrix.shift_horizontal(True, Matrix(self.height, 1))
-        #self.frame = self.message_matrix.get_submatrix(self.height, self.length)
+        self.message_matrix.shift_horizontal(True, Matrix(self.height, 1))
 
     #turn off all pixels
     def turn_off(self):
@@ -72,10 +71,10 @@ class Led_Board(object):
             self.strip.setPixelColor(i, color)
         self.strip.show()
 
-    #display message on the LED Board 
+    #display message on the LED Board - buffer in seconds
     def display_message(self, buffer):
         #validate
-        if (not type(buffer) is int or buffer < 1):
+        if (not type(buffer) is float or buffer <= 0):
             raise LedError("Invalid time buffer")
 
         #self.strip.begin()

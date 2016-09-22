@@ -13,7 +13,7 @@ test_board = Led_Board(length, height, message, strip_options)
 
 #display message certain number of times
 count = 0
-buffer = 100
+buffer = 0.1
 while (count < 5):
     test_board.display_message(buffer)
     count = count + 1
