@@ -73,8 +73,9 @@ print("")
 
 #horizontal shift
 print("Shift horizontally")
-test.shift_horizontal(True, col)
-test.print_matrix()
+#col = Matrix(other_test.m, 1)
+other_test.shift_horizontal(True, col)
+other_test.print_matrix()
 test.shift_horizontal(False, col)
 test.print_matrix()
 
