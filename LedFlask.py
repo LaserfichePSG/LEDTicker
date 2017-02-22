@@ -45,9 +45,9 @@ def LedMessage ():
         log.WriteLog("Bad request body: " + inner, 0)
         raise BadRequest("Could not extract message!", inner)
     
-	# check for debug case
+	# check for command case
 	if msg[:1] == '&':
-		log.WriteLog("Debug character detected.", 0)
+		log.WriteLog("Command character detected.", 0)
     else:
 		for char in msg:
 			if not char in char_map: 

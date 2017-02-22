@@ -1,6 +1,7 @@
 from MatrixRGB import Matrix
 from neopixel import *
 from Led_Character_Map import char_map
+from Command_Set import Command
 import time
 
 
@@ -21,10 +22,10 @@ class Led_Board(object):
         self.message_matrix = self.generate_message_matrix()
         #self.frame = self.message_matrix.get_submatrix(self.height, self.length)
 		
-		#check for debug command using debug character "&"
-		self.debug = False
+		#check for command mode using character "&"
+		self.command = False
 		if (message[:1] == '&'):
-			self.debug = True
+			self.command = True
 			
 		self.strip.begin()
 
@@ -82,13 +83,19 @@ class Led_Board(object):
         #validate
         if (not type(buffer) is float or buffer <= 0):
             raise LedError("Invalid time buffer")
-
+		
+		if (self.command):
+			#run command
+			command = Command(self.strip, self.message)
+			command.run()
+			
         #self.strip.begin()
-        while (not self.message_matrix.is_empty()):
-            self.set_frame()
-            self.shift_frame()
-            self.strip.show()
-            time.sleep(buffer)
+        else:
+			while (not self.message_matrix.is_empty()):
+				self.set_frame()
+				self.shift_frame()
+				self.strip.show()
+				time.sleep(buffer)
 
 
 
