@@ -45,10 +45,14 @@ def LedMessage ():
         log.WriteLog("Bad request body: " + inner, 0)
         raise BadRequest("Could not extract message!", inner)
     
-    for char in msg:
-        if not char in char_map:
-            log.WriteLog("Invalid character encountered for message " + msg, 0)
-            raise BadRequest("Invalid character encountered", "Bad character: " + str(char))
+	# check for debug case
+	if msg[:1] == '&':
+		log.WriteLog("Debug character detected.", 0)
+    else:
+		for char in msg:
+			if not char in char_map: 
+				log.WriteLog("Invalid character encountered for message " + msg, 0)
+				raise BadRequest("Invalid character encountered", "Bad character: " + str(char))
         
     #push valid message to a job queue for async processing
     q.put_nowait(msg)

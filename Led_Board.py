@@ -20,7 +20,13 @@ class Led_Board(object):
         self.strip = Adafruit_NeoPixel((length*height), strip_options["led_pin"], strip_options["led_frequency"], strip_options["led_dma"], strip_options["led_invert"], strip_options["led_brightness"])
         self.message_matrix = self.generate_message_matrix()
         #self.frame = self.message_matrix.get_submatrix(self.height, self.length)
-        self.strip.begin()
+		
+		#check for debug command using debug character "&"
+		self.debug = False
+		if (message[:1] == '&'):
+			self.debug = True
+			
+		self.strip.begin()
 
 
     #create a message matrix from internal message string
