@@ -47,6 +47,6 @@ def execute(message, length, height, buffer):
         print ("")
         time.sleep(buffer)
 
-execute("hello world!", 9, 5, 0.1)
+execute("hello world!", 60, 5, 0.1)
 
                 

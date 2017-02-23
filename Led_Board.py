@@ -1,3 +1,4 @@
+from Led_Base import Led_Base
 from MatrixRGB import Matrix
 from neopixel import *
 from Led_Character_Map import char_map
@@ -5,7 +6,7 @@ import time
 
 
 #class to represent LED board
-class Led_Board(object):
+class Led_Board(Led_Base):
 
     #constructor
     def __init__(self, length, height, message, strip_options):
@@ -38,9 +39,14 @@ class Led_Board(object):
             count = count + 1
 
         #pad with empty pixels to fill out board
+        #POTENTIAL ENHANCEMENT: CHANGE THIS CODE TO ALWAYS PAD TO THE LEFT THE LENGTH OF THE ENTIRE BOARD
+        #THIS WAY, THE MESSAGE WILL ALWAYS START SCROLLING FROM THE RIGHT
         if (result.n < self.length):
             result = result.concatenate(Matrix(self.height, self.length - result.n))
 
+        #temp = Matrix(self.height, self.length)
+        #result = temp.concatenate(result)
+        
         return result
 
 

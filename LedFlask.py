@@ -5,15 +5,16 @@ import sys
 from LogWriter import LogWriter
 from api_exceptions import *
 from flask import Flask, request, jsonify
-from Led_Board import Led_Board
-from Led_Character_Map import char_map
-from Led_Config import Led_Config
+from Validator import Validator
+from Executor import Executor
 
 #global vars
 q = asyncio.Queue()
 EndQueue = False
 t = None
 log = LogWriter('logs', 'led_log', 2)
+validator = None
+executor = None
 
 app = Flask(__name__)
 
@@ -34,29 +35,44 @@ def handle_bad_request(error):
 @app.route("/LedMessage", methods=['POST'])
 def LedMessage ():
 
-    #validate request param
+    #validate request params
     content = request.get_json(force=True)
     
-    msg = None
+    display_type = None
+    command = None
     try:
-        msg = str(content["message"]).lower()
+        display_type = str(content["type"]).lower()
     except Exception as e:
         inner = GetInnerException()
         log.WriteLog("Bad request body: " + inner, 0)
-        raise BadRequest("Could not extract message!", inner)
-    
-    for char in msg:
-        if not char in char_map:
-            log.WriteLog("Invalid character encountered for message " + msg, 0)
-            raise BadRequest("Invalid character encountered", "Bad character: " + str(char))
+        raise BadRequest("Could not extract board request type!", inner)
         
-    #push valid message to a job queue for async processing
-    q.put_nowait(msg)
-    log.WriteLog("Queued message " + msg, 2)
-    if q.empty():
-        return "Your message will be displayed momentarily."
-    else:
-        return "Your message has been queued and will be displayed when the board is next available."
+    try:
+        command = str(content["command"]).lower()
+    except Exception as e:
+        inner = GetInnerException()
+        log.WriteLog("Bad request body: " + inner, 0)
+        raise BadRequest("Could not extract board request command!", inner)
+        
+    validator = Validator(display_type, command)
+    result = False
+    try:
+        result = validator.ValidateRequest()
+    except Exception as e:
+        inner = GetInnerException()
+        log.WriteLog("Bad request body: " + inner, 0)
+        raise BadRequest("Request failed validation!", inner)
+    
+    if result:
+        #push valid requests to a job queue for async processing
+        q.put_nowait((display_type, command))
+        log.WriteLog("Queued command "+(display_type, command), 2)
+        if q.empty():
+            return "Your command will be executed momentarily."
+        else:
+            return "Your command has been queued and will be executed when the board is next available."
+        
+    
     
 #this route effectively ends the program
 #but first allows the job queue to empty
@@ -75,28 +91,17 @@ def BoardOff ():
     log.WriteLog("Terminate route called", 1)
     return "The program will end momentarily"
 
-#method to facilitate the display of a single message
-def DisplayMessage (msg):
+#method to facilitate the execution of a given command
+def ExecuteCommand (command):
     
-    #initialize board
-    led_board = None
-    config = Led_Config()
+    executor = Executor(command[0], command[1])
     try:
-        led_board = Led_Board(config.board_length, config.board_height, msg, config.strip_options)
+        executor.ExecuteCommand()
     except Exception as e:
-        log.WriteLog("LED board initialization error: " + GetInnerException(), 0)
-
-    #display message certain number of times
-    count = 0
-    while (count < config.display_count):
-        try:
-            led_board.display_message(config.scroll_buffer)
-        except Exception as e:
-            log.WriteLog("LED board display error: " + GetInnerException(), 0)
-        count = count + 1
-
-    #turn off board
-    led_board.turn_off()
+        inner = GetInnerException()
+        log.WriteLog("Command execution error for " + command + ": " + inner, 0)
+    
+    
 
 #method to execute pending jobs in the job queue
 #this runs in an independent thread
@@ -105,16 +110,16 @@ def ProcessQueue ():
     #while web server is running, grab jobs from the global job queue to execute
     while (not EndQueue):
         if not q.empty():
-            msg = q.get_nowait()
-            log.WriteLog("Displaying message " + msg, 2)
-            DisplayMessage(msg)
+            command = q.get_nowait()
+            log.WriteLog("Executing command " + msg, 2)
+            ExecuteCommand(command)
             time.sleep(1)
             
     #once web server has been terminated, process remaining jobs in the queue
     while (not q.empty()):
-        msg = q.get_nowait()
-        log.WriteLog("Displaying message " + msg, 2)
-        DisplayMessage(msg)
+        command = q.get_nowait()
+        log.WriteLog("Executing command " + msg, 2)
+        ExecuteCommand(command)
         
     #finally, terminate the program
     log.WriteLog("Program terminated", 1)
