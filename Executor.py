@@ -31,7 +31,7 @@ class Executor:
         led_board = None
         config = Led_Config()
         try:
-            led_board = Led_Board(config.board_length, config.board_height, msg, config.strip_options)
+            led_board = Led_Board(config.board_length, config.board_height, self._command, config.strip_options)
         except Exception as e:
             raise e
         

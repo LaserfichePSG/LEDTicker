@@ -1,4 +1,3 @@
-from Led_Base import Led_Base
 from MatrixRGB import Matrix
 from neopixel import *
 from Led_Character_Map import char_map
@@ -6,7 +5,7 @@ import time
 
 
 #class to represent LED board
-class Led_Board(Led_Base):
+class Led_Board(object):
 
     #constructor
     def __init__(self, length, height, message, strip_options):
